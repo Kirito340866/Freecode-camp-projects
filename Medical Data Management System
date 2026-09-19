@@ -1,0 +1,183 @@
+import re
+import sys
+patients = [
+    {
+        "id": "P001",
+        "name": "Alice",
+        "age": 25,
+        "diseases": {"diabetes", "asthma"}
+    },
+    {
+        "id": "P002",
+        "name": "Bob",
+        "age": 40,
+        "diseases": {"asthma"}
+    }
+]
+
+options = """
+1. Add patient
+2. Remove patient
+3. Find patient
+4. Update patient
+5. Add disease
+6. Remove disease
+7. Find patients with disease
+8. Show all diseases
+9. Validate all records
+10. Exit
+"""
+print("="*10 + "[ Medical Data Management System ]" + "="*10)
+print(f"\n{options}\n")
+
+condition = True
+
+def print_info():
+        print(f"\n{name.title()}\'s Information: \n")
+        print(f"{'ID':<15}:{patient['id']}")
+        print(f"{'Name':<15}:{patient['name']}")
+        print(f"{'Age':<15}:{patient['age']}")
+        print(f"{'Diseases':<15}:{patient['diseases']}")
+
+def checker(id,name,age,disease_set):
+        global condition
+        id_pattern = r"p\d{3}"
+        name_pattern = r"\b[a-zA-z]"
+        disease_pattern = r"\b[a-zA-Z]"
+        if id != None:
+                if not isinstance(id,str) or not re.match(id_pattern,id,re.IGNORECASE):
+                        print(f"[-] Invalid ID format: at {id}")
+                        condition = False
+                        return
+        if age != None:
+                if not isinstance(age,int) or  0 > age >100:
+                        print(f"[-] Invalid age format: at {age}")
+                        condition = False
+                        return
+        if name != None:
+                if not isinstance(name,str) or not re.match(name_pattern,name):
+                        print(f"[-] Invalid name format: at {name}")
+                        condition = False
+                        return
+        if disease_set != None:
+                for disease in disease_set:
+                        if not isinstance(disease,str) or not re.match(disease_pattern,disease):
+                                print(f"[-] Invalid disease format: at {disease} from {disease_set}")
+                                condition = False
+                                return
+def get_info():
+        global condition
+        disease_set = set()
+        id = input("Enter patient's ID: ")
+        name = input("Enter patient's name: ")
+        age = int(input("Enter patient's age: "))
+        diseases = input("Enter Diseases: ")
+        diseases = diseases.split(',')
+        for dise in diseases:
+                disease_set.add(dise)
+        return id,name,age,disease_set
+option = int(input("Choice an option (1-10): "))
+
+if option == 1:
+        id,name,age,diseases = get_info()
+        checker(id,name,age,diseases)
+        if condition:
+                patients.append({"id":id.title(),"name":name,"age":age,"diseases":diseases})
+                print(f"[+]Patient {name} is successfully Added!")
+if option == 2:
+        name = input("Enter patient's Name: ")
+        checker(None,name,None,None)
+        if condition:
+                for index,patient in enumerate(patients):
+                        if name.lower() == patient['name'].lower():
+                                del patients[index]
+if option == 3:
+        name= input("Enter patient's Name: ")
+        checker(None,name,None,None)
+        if condition:
+                for patient in patients:
+                        if name.lower() == patient['name'].lower():
+                                print_info()
+update_option = """\n
+1) ID
+2) Name
+3) Age
+4) Diseases
+"""
+if option == 4:
+        name = input("Enter patient's Name: ")
+        checker(None,name,None,None)
+        if condition:
+                for patient in patients:
+                        if name.lower() == patient['name'].lower():
+                                print(update_option)
+                                up_option = int(input("Choice an Option (1-4): "))
+                                if up_option == 1:
+                                        n_id = input("Enter New ID: ")
+                                        checker(n_id,None,None,None)
+                                        if condition:
+                                                patient['id'] = n_id.title()
+                                                print_info()
+                                if up_option == 2:
+                                        n_name = input("Enter New Name: ")
+                                        checker(None,n_name,None,None)
+                                        if condition:
+                                                patient['name'] = n_name
+                                                print_into()
+                                if up_option == 3:
+                                        n_age = int(input("Enter New Age: "))
+                                        checker(None,None,n_age,None)
+                                        if condition:
+                                                patient['age'] = n_age
+                                                print_info()
+                                if up_option == 4:
+                                        n_disease_set = set()
+                                        n_diseases = input("Enter New Diseases: ")
+                                        n_diseases = n_diseases.split(',')
+                                        for dise in n_diseases:
+                                                n_disease_set.add(dise)
+                                        checker(None,None,None,n_disease_set)
+                                        if condition:
+                                                patient['diseases'] = n_disease_set
+                                                print_info()
+
+if option == 5:
+        name = input("Enter Patient's Name: ")
+        checker(None,name,None,None)
+        if condition:
+                for patient in patients:
+                        if name.lower() == patient['name'].lower():
+                                diseases = input("Enter Diseases: ")
+                                diseases = diseases.split(',')
+                                for dise in diseases:
+                                        patient['diseases'].add(dise)
+                                print_info()
+if option == 6:
+        name = input("Enter Patient's Name: ")
+        checker(None,name,None,None)
+        if condition:
+                for patient in patients:
+                        if name.lower() == patient['name'].lower():
+                                disease = input("Enter Disease: ")
+                                patient['diseases'].remove(disease)
+                                print_info()
+if option == 7:
+        disease = input("Enter Disease: ")
+        if re.match(r"\b[a-zA-Z]",disease):
+                for patient in patients:
+                        for dise in patient['diseases']:
+                                if disease == dise:
+                                        name = patient['name']
+                                        print_info()
+
+if option == 8:
+        for patient in patients:
+                print(patient['diseases'])
+if option == 9:
+        for patient in patients:
+                checker(patient['id'],patient['name'],patient['age'],patient['diseases'])
+                if condition:
+                        print("[+] All records are Valid")
+if option == 10:
+        print("[-] Exited From Progrem")
+        sys.exit()
