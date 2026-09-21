@@ -1,0 +1,254 @@
+import sys
+import time
+class Book:
+	def __init__(self,title,author,category,available=True):
+		self.title = title
+		self.author = author
+		self.category = category
+		self.available = available
+	def mark_as_borrowed(self):
+		self.available = False
+	def info(self):
+		print(f"\n{'Title':<15}:{self.title}")
+		print(f"{'Category':<15}:{self.category}")
+		print(f"{'Available':<15}:{self.available}")
+		print(f"{'Author':<15}:{self.author}\n")
+class Member:
+	def __init__(self,name):
+		self.name = name
+		self.borrowed_books = []
+	def borrow_book(self,book):
+		if not book.available:
+			print("\n[-] This book is not Available")
+			return
+		self.borrowed_books.append(book)
+		book.mark_as_borrowed()
+		print(f"\n[+] Book: {book.title} is borrowed")
+	def return_book(self,book):
+		if not book in self.borrowed_books:
+			print("\n[-] This book is not borrowed!")
+			return
+		self.borrowed_books.remove(book)
+		book.available = True
+		print(f"\n[+] Book: {book.title} is returned")
+	def info(self):
+		print(f"\n{self.name}\'s Info: \n")
+		print(f"{'Name':<15}:{self.name}")
+		print(f"Borrowed Books: \n")
+		count = 0
+		for n in range(len(self.borrowed_books)):
+			count += 1
+			print(f"{count}. {self.borrowed_books[n].title}")
+class Library:
+	def __init__(self,name):
+		self.name = name
+		self.books = []
+		self.members = []
+	def borrow_book(self,name,book):
+		if not book in self.books:
+			print(f"\n[-] Book: {book.title} is not in the library")
+			return
+		if not name in self.members:
+			print(f"\n[-] Name: {name.name} is not Member")
+		name.borrow_book(book)
+	def return_book(self,name,book):
+		name.return_book(book)
+	def book_info(self,book):
+		if not book in self.books:
+			print(f"\n[-] Book: {book.title} is not in the library")
+			return
+		book.info()
+	def member_info(self,name):
+		if not name in self.members:
+			print(f"\n[-] Name: {name.name} is not Member")
+			return
+		name.info()
+	def all_members(self):
+		print("\n========[ MEMBERS ]========\n")
+		count = 0
+		for member in self.members:
+			count += 1
+			print(f"{count}. {member.name}")
+	def all_books(self):
+		print("\n========[ BOOKS ]=======\n")
+		count = 0
+		for book in self.books:
+			count += 1
+			print(f"{count}. {book.title}")
+	def statistics(self):
+		total_books = 0
+		available_book = 0
+		borrowed_book = 0
+		members = 0
+		for book in self.books:
+			total_books += 1
+			if book.available:
+				available_book += 1
+			if not book.available:
+				borrowed_book += 1
+		for member in self.members:
+			members += 1
+		print(f"{'Total Books':<20}:{total_books}")
+		print(f"{'Available':<20}:{available_book}")
+		print(f"{'Borrowed':<20}:{borrowed_book}")
+		print(f"{'Members':<20}:{members}")
+star = Library('Star')
+class Admin:
+	def __init__(self,name):
+		self.name = name
+	def add_book(self,book):
+		star.books.append(book)
+		print(f"\n[+] Book: {book.title} is added to Library: {star.name}")
+	def remove_book(self,book):
+		if not book in star.books:
+			print(f"\n[-] Book: {book.title} not found in the Library")
+			return
+		star.books.remove(book)
+		print(f"\n[+] Book: {book.title} is removed from Library")
+	def find_book(self,book):
+		if not book in star.books:
+			print(f"\n[-] Book: {book.title} is not in the library")
+			return
+		book.info()
+	def add_member(self,member):
+		star.members.append(member)
+		print(f"\n[+] Name: {member.name} is added to Members")
+	def remove_member(self,member):
+		if not member in star.members:
+			print(f"\n[-] {member.name} is not Member")
+			return
+		star.members.remove(member)
+		print(f"\n[+] {member.name} is removed from members")
+	def find_member(self,member):
+		if not member in star.members:
+			print(f"\n[-] {member.name} is not Member")
+			return
+		member.info()
+	def borrow_book(self,name,book):
+		star.borrow_book(name,book)
+	def return_book(self,name,book):
+		star.return_book(name,book)
+	def show_all_books(self):
+		star.all_books()
+	def show_all_members(self):
+		star.all_members()
+	def statistics(self):
+		star.statistics()
+options = """\n
+=============================
+      PERSONAL LIBRARY
+=============================
+
+1. Add Book
+2. Remove Book
+3. Find Book
+4. Add Member
+5. Remove Member
+6. Find Member
+7. Borrow Book
+8. Return Book
+9. Show All Books
+10. Show All Members
+11. Statistics
+12. Exit\n
+"""
+admin = Admin('Kirito')
+book1 = Book("Black hat python","IDK","Hacking")
+book2 = Book("Python","IDK","Programming")
+book3 = Book("Java","IDK","Programming")
+book4 = Book("C++","IDK","Programming")
+book5 = Book("FUcking","IDK","Sex")
+books = [book1,book2,book3,book4,book5]
+
+alice = Member('Alice')
+bob = Member('Bob')
+steve = Member('Steve')
+John = Member('John')
+members = [alice,bob,steve,John]
+while True:
+	print(options)
+	option = int(input("Choose (1-12): "))
+
+	if option == 1:
+		count = 0
+		for book in books:
+			count += 1
+			print(f"{count}) {book.title}")
+		book_op = int(input(f"Choose Book (1-{len(books)}): "))
+		admin.add_book(books[book_op - 1])
+	if option == 2:
+		count = 0
+		if not star.books:
+			print("\n[-] There is no book in the library")
+			sys.exit()
+		for book in star.books:
+			count += 1
+			print(f"{count}) {book.title}")
+		book_op = int(input(f"Choose Book (1-{len(books)}):"))
+		admin.remove_book(star.books[book_op-1])
+	if option == 3:
+		count = 0
+		for book in books:
+			count += 1
+			print(f"{count}) {book.title}")
+		book_op = int(input(f"Choose Book (1-{len(books)}): "))
+		admin.find_book(books[book_op-1])
+	if option == 4:
+		count = 0
+		for member in members:
+			count += 1
+			print(f"{count}) {member.name}")
+		member_op = int(input(f"Choose (1-{len(members)}): "))
+		admin.add_member(members[member_op - 1])
+	if option == 5:
+		count = 0
+		if not star.members:
+			print(f"[-] There is no Member in Library")
+			sys.exit()
+		for member in star.members:
+			count += 1
+			print(f"{count}) {member.name}")
+		member_op = int(input("Choose (1-{len(star.members)}): "))
+		admin.remove_member(star.members[member_op - 1])
+	if option == 6:
+		count = 0
+		for member in members:
+			count += 1
+			print(f"{count}) {member.name}")
+		member_op = int(input(f"Choose (1-{len(members)}): "))
+		admin.find_member(members[member_op - 1])
+	if option == 7:
+		count1 = 0
+		count2 = 0
+		for member in members:
+			count1 += 1
+			print(f"{count1}) {member.name}")
+		member_op = int(input(f"Choose (1-{len(members)}): "))
+		for book in books:
+			count2 += 1
+			print(f"{count2}) {book.title}")
+		book_op = int(input(f"Choose (1-{len(books)}): "))
+		admin.borrow_book(members[member_op - 1],books[book_op - 1])
+	if option == 8:
+		count1 = 0
+		count2 = 0
+		for member in members:
+			count1 += 1
+			print(f"{count1}) {member.name}")
+		member_op = int(input(f"Choose (1-{len(members)}): "))
+		for book in books:
+			count2 += 1
+			print(f"{count2}) {book.title}")
+		book_op = int(input(f"Choose (1-{len(books)}): "))
+		admin.return_book(members[member_op - 1],books[book_op - 1])
+		time.sleep(1)
+	if option == 9:
+		admin.show_all_books()
+		time.sleep(1)
+	if option == 10:
+		admin.show_all_members()
+	if option == 11:
+		admin.statistics()
+		time.sleep(1)
+	if option == 12:
+		break
